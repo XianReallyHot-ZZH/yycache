@@ -21,12 +21,14 @@ public class YYApplicationListener implements ApplicationListener<ApplicationEve
 
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
+        // 相当于ApplicationRunner，在容器启动后的一个事件
         if (event instanceof ApplicationReadyEvent are) {
             for (YYPlugin plugin : plugins) {
                 plugin.init();
                 plugin.startup();
             }
         }
+        // 在容器关闭前的一个事件
         if (event instanceof ContextClosedEvent cce) {
             for (YYPlugin plugin : plugins) {
                 plugin.shutdown();
