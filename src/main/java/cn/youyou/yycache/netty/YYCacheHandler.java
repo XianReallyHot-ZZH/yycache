@@ -1,5 +1,6 @@
 package cn.youyou.yycache.netty;
 
+import cn.youyou.yycache.core.YYCache;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -16,12 +17,25 @@ public class YYCacheHandler extends SimpleChannelInboundHandler<String> {
     private static final String CRLF = "\r\n";
 
     // redis协议中响应简单字符串的标识符
-    private static final String STR_STRING = "+";
+    private static final String STR_PREFIX = "+";
+
+    // redis协议中响应复杂字符串的标识符
+    private static final String BULK_PREFIX = "$";
+
+    // redis协议中响应数字的标识符
+    private static final String NUMBER_PREFIX = ":";
+
+    // redis协议中响应数组的标识符
+    private static final String ARRAY_PREFIX = "*";
+
+    private static final String ERROR_PREFIX = "-";
 
     private static final String OK = "OK";
 
     private static final String SERVER_INFO = "YYCache Server[v1.0.0], created by XianReallyHot-ZZH." + CRLF
             + "Mock Redis Server, at 2024-06-15 in HangZhou." + CRLF;
+
+    private static final YYCache cache = new YYCache();
 
 
     @Override
@@ -46,18 +60,137 @@ public class YYCacheHandler extends SimpleChannelInboundHandler<String> {
             if (args.length >= 5) {
                 ret = args[4];
             }
-            simpleString(ctx, ret);
+            writeSimpleString(ctx, ret);
         } else if ("INFO".equals(cmd)) {
-            bulkString(ctx, SERVER_INFO);
+            writeBulkString(ctx, SERVER_INFO);
+        } else if ("SET".equals(cmd)) {
+            cache.set(args[4], args[6]);
+            writeSimpleString(ctx, OK);
+        } else if ("GET".equals(cmd)) {
+            String value = cache.get(args[4]);
+            writeBulkString(ctx, value);
+        } else if ("STRLEN".equals(cmd)) {
+            String value = cache.get(args[4]);
+            writeInteger(ctx, value == null ? 0 : value.length());
+        } else if ("DEL".equals(cmd)) {
+            // 该指令支持批量，所以需要计算出key的个数
+            int len = (args.length - 3) / 2;
+            String[] keys = new String[len];
+            for (int i = 0; i < len; i++) {
+                keys[i] = args[i * 2 + 4];
+            }
+            int del = cache.del(keys);
+            writeInteger(ctx, del);
+        } else if ("EXISTS".equals(cmd)) {
+            // 该指令支持批量，所以需要计算出key的个数
+            int len = (args.length - 3) / 2;
+            String[] keys = new String[len];
+            for (int i = 0; i < len; i++) {
+                keys[i] = args[i * 2 + 4];
+            }
+            writeInteger(ctx, cache.exists(keys));
+        } else if ("MGET".equals(cmd)) {
+            // 该指令支持批量，所以需要计算出key的个数
+            int len = (args.length - 3) / 2;
+            String[] keys = new String[len];
+            for (int i = 0; i < len; i++) {
+                keys[i] = args[i * 2 + 4];
+            }
+            writeArray(ctx, cache.mget(keys));
+        } else if ("MSET".equals(cmd)) {
+            // 该指令支持批量，所以需要计算出key和value的个数
+            int len = (args.length - 3) / 4;
+            String[] keys = new String[len];
+            String[] values = new String[len];
+            for (int i = 0; i < len; i++) {
+                keys[i] = args[i * 4 + 4];
+                values[i] = args[i * 4 + 6];
+            }
+            cache.mset(keys, values);
+            writeSimpleString(ctx, OK);
+        } else if ("INCR".equals(cmd)) {
+            String key = args[4];
+            try {
+                writeInteger(ctx, cache.incr(key));
+            } catch (Exception e) {
+                writeError(ctx, "NFE key: " + key + " value: " + cache.get(key) + " is not an integer.");
+            }
+        } else if ("DECR".equals(cmd)) {
+            String key = args[4];
+            try {
+                writeInteger(ctx, cache.decr(key));
+            } catch (Exception e) {
+                writeError(ctx, "NFE key: " + key + " value: " + cache.get(key) + " is not an integer.");
+            }
         } else {
-            simpleString(ctx, OK);
+            writeSimpleString(ctx, OK);
         }
 
 
     }
 
     /**
-     * 将符合协议的字符串封装成ByteBuf，并写入到Channel中
+     * 错误响应封装
+     * @param ctx
+     * @param msg
+     */
+    private void writeError(ChannelHandlerContext ctx, String msg) {
+        writeByteBuf(ctx, errorEncode(msg));
+    }
+
+    private String errorEncode(String msg) {
+        return ERROR_PREFIX + msg + CRLF;
+    }
+
+    /**
+     * 数组的协议响应封装
+     * @param ctx
+     * @param array
+     */
+    private void writeArray(ChannelHandlerContext ctx, String[] array) {
+        writeByteBuf(ctx, arrayEncode(array));
+    }
+
+    private String arrayEncode(Object[] array) {
+        StringBuilder sb = new StringBuilder();
+        if (array == null) {
+            sb.append(ARRAY_PREFIX + "-1" + CRLF);
+        } else if (array.length == 0) {
+            sb.append(ARRAY_PREFIX + "0" + CRLF);
+        } else {
+            sb.append(ARRAY_PREFIX + array.length + CRLF);
+            for (Object obj : array) {
+                if (obj == null) {
+                    sb.append("$-1" + CRLF);
+                } else {
+                    if (obj instanceof String) {
+                        sb.append(bulkStringEncode((String) obj));
+                    } else if (obj instanceof Integer) {
+                        sb.append(integerEncode((Integer) obj));
+                    } else if (obj instanceof Object[] objs) {
+                        sb.append(arrayEncode(objs));
+                    }
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 整数的协议响应封装
+     * @param ctx
+     * @param i
+     */
+    private void writeInteger(ChannelHandlerContext ctx, int i) {
+        writeByteBuf(ctx, integerEncode(i));
+    }
+
+    private String integerEncode(int i) {
+        return NUMBER_PREFIX + i + CRLF;
+    }
+
+    /**
+     * 将符合协议的字符串封装成ByteBuf，并写入到Channel中,是跟netty实现的网络相关的方法
      * @param ctx
      * @param content
      */
@@ -73,8 +206,20 @@ public class YYCacheHandler extends SimpleChannelInboundHandler<String> {
      * @param ctx
      * @param content
      */
-    private void simpleString(ChannelHandlerContext ctx, String content) {
-        writeByteBuf(ctx, STR_STRING + content + CRLF);
+    private void writeSimpleString(ChannelHandlerContext ctx, String content) {
+        writeByteBuf(ctx, simpleStringEncode(content));
+    }
+
+    private String simpleStringEncode(String content) {
+        String ret;
+        if (content == null) {
+            ret = "-1" + CRLF;
+        } else if (content.isEmpty()) {
+            ret = "0" + CRLF;
+        } else {
+            ret = STR_PREFIX + content + CRLF;
+        }
+        return ret;
     }
 
     /**
@@ -82,8 +227,20 @@ public class YYCacheHandler extends SimpleChannelInboundHandler<String> {
      * @param ctx
      * @param content
      */
-    private void bulkString(ChannelHandlerContext ctx, String content) {
-        writeByteBuf(ctx, "$" + content.getBytes().length + CRLF + content + CRLF);
+    private void writeBulkString(ChannelHandlerContext ctx, String content) {
+        writeByteBuf(ctx, bulkStringEncode(content));
+    }
+
+    private String bulkStringEncode(String content) {
+        String ret;
+        if (content == null) {
+            ret = "$-1" + CRLF;
+        } else if (content.isEmpty()) {
+            ret = "$0" + CRLF;
+        } else {
+            ret = BULK_PREFIX + content.getBytes().length + CRLF + content + CRLF;
+        }
+        return ret;
     }
 
 
