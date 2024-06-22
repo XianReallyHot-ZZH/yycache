@@ -32,7 +32,7 @@ public class YYCacheDecoder extends ByteToMessageDecoder {
         byte[] bytes = new byte[count];
         in.readBytes(bytes);
         String message = new String(bytes);
-        log.info("message: {}", message);
+        log.info("receive message: {}", message);
 
         out.add(message);
     }
