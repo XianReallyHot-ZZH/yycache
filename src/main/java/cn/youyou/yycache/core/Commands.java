@@ -1,6 +1,6 @@
 package cn.youyou.yycache.core;
 
-import cn.youyou.yycache.command.CommandCommand;
+import cn.youyou.yycache.command.*;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -20,7 +20,29 @@ public class Commands {
      * 注册所有Command实现类
      */
     private static void registryCommands() {
+        // common commands
         register(new CommandCommand());
+        register(new InfoCommand());
+        register(new PingCommand());
+
+        // string
+        register(new SetCommand());
+        register(new GetCommand());
+        register(new StrlenCommand());
+        register(new DelCommand());
+        register(new ExistsCommand());
+        register(new IncrCommand());
+        register(new DecrCommand());
+        register(new MsetCommand());
+        register(new MgetCommand());
+
+        // list
+
+        // set
+
+        // hash
+
+        // zset
 
     }
 

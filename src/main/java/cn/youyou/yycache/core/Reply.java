@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Command指令执行返回的对象
+ *
  * @param <T>
  */
 @Data
@@ -31,10 +32,6 @@ public class Reply<T> {
     // redis协议中响应异常的标识符
     private static final String ERROR_PREFIX = "-";
 
-    // redis协议中响应服务器信息
-    private static final String SERVER_INFO = "YYCache Server[v1.0.0], created by XianReallyHot-ZZH." + CRLF
-            + "Mock Redis Server, at 2024-06-15 in HangZhou." + CRLF;
-
 
     T value;
 
@@ -42,6 +39,7 @@ public class Reply<T> {
 
     /**
      * simpleString类型的构造方法
+     *
      * @param value
      * @return
      */
@@ -51,6 +49,7 @@ public class Reply<T> {
 
     /**
      * 对应RESP协议中error类型的构造方法
+     *
      * @param value
      * @return
      */
@@ -60,6 +59,7 @@ public class Reply<T> {
 
     /**
      * 对应RESP协议中integer类型的构造方法
+     *
      * @param value
      * @return
      */
@@ -69,6 +69,7 @@ public class Reply<T> {
 
     /**
      * 对应RESP协议中bulkString类型的构造方法
+     *
      * @param value
      * @return
      */
@@ -78,6 +79,7 @@ public class Reply<T> {
 
     /**
      * 对应RESP协议中array类型的构造方法
+     *
      * @param value
      * @return
      */
@@ -87,6 +89,7 @@ public class Reply<T> {
 
     /**
      * 按协议编码
+     *
      * @return
      */
     public String encode() {
@@ -102,6 +105,7 @@ public class Reply<T> {
 
     /**
      * 对应RESP协议中simpleString类型的编码
+     *
      * @param content
      * @return
      */
@@ -119,6 +123,7 @@ public class Reply<T> {
 
     /**
      * 对应RESP协议中bulkString类型的编码
+     *
      * @param content
      * @return
      */
@@ -136,6 +141,7 @@ public class Reply<T> {
 
     /**
      * 对应RESP协议中integer类型的编码
+     *
      * @param i
      * @return
      */
@@ -145,6 +151,7 @@ public class Reply<T> {
 
     /**
      * 对应RESP协议中array类型的编码
+     *
      * @param array
      * @return
      */
@@ -175,6 +182,7 @@ public class Reply<T> {
 
     /**
      * 对应RESP协议中error类型的编码
+     *
      * @param msg
      * @return
      */

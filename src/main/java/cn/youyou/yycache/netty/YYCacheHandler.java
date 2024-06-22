@@ -35,13 +35,20 @@ public class YYCacheHandler extends SimpleChannelInboundHandler<String> {
         if (command == null) {
             writeContext(ctx, Reply.error("ERR unsupported command '" + cmd + "'"));
         } else {
-            writeContext(ctx, command.execute(cache, args));
+            // TODO：先粗略处理一手异常返回，这一块后续可以继续优化，针对具体的异常返回更具有针对性、更详细的错误提示
+            try {
+                writeContext(ctx, command.execute(cache, args));
+            } catch (Exception e) {
+                log.error("Command指令执行异常, exception with msg: {}", e.getMessage());
+                Reply<?> reply = Reply.error("EXP exception with msg: '" + e.getMessage() + "'");
+                writeContext(ctx, reply);
+            }
         }
-
     }
 
     /**
      * 将指令执行结果按照协议编码格式进行编码后写入到ChannelHandlerContext中
+     *
      * @param ctx
      * @param reply
      */

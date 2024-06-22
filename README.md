@@ -16,10 +16,12 @@ yycache实现了redis的协议，支持redis的部分指令，redis-cli可以正
   * ZSet
   * Hash
 * doing：实现常见操作命令：
-  * Command
-  * Info
-  * Ping
-  * ...
+  * 基础指令: Command,Info,Ping
+  * String类型指令: Set,Get,Strlen,Del,Exists,Incr,Decr,Mset,Mget
+  * List类型指令:
+  * Set类型指令:
+  * Hash类型指令:
+  * ZSet类型指令:
 * TODO：实现对于Lua脚本的支持；
 * TODO：实现redis的集群模式；
 * TODO：实现redis的哨兵模式；
