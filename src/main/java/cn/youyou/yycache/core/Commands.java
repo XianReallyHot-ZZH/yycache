@@ -54,13 +54,13 @@ public class Commands {
         register(new SismemberCommand());
 
         // hash
-//        register(new HsetCommand());
-//        register(new HgetCommand());
-//        register(new HgetallCommand());
-//        register(new HlenCommand());
-//        register(new HdelCommand());
-//        register(new HexistsCommand());
-//        register(new HmgetCommand());
+        register(new HsetCommand());
+        register(new HgetCommand());
+        register(new HgetallCommand());
+        register(new HlenCommand());
+        register(new HdelCommand());
+        register(new HexistsCommand());
+        register(new HmgetCommand());
 
         // zset
 //        register(new ZaddCommand());
