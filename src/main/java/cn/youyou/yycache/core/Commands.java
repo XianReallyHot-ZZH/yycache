@@ -37,12 +37,38 @@ public class Commands {
         register(new MgetCommand());
 
         // list
+        register(new LpushCommand());
+        register(new LpopCommand());
+        register(new RpopCommand());
+        register(new RpushCommand());
+        register(new LlenCommand());
+        register(new LindexCommand());
+        register(new LrangeCommand());
 
         // set
+//        register(new SaddCommand());
+//        register(new SmembersCommand());
+//        register(new SremCommand());
+//        register(new ScardCommand());
+//        register(new SpopCommand());
+//        register(new SismemberCommand());
 
         // hash
+//        register(new HsetCommand());
+//        register(new HgetCommand());
+//        register(new HgetallCommand());
+//        register(new HlenCommand());
+//        register(new HdelCommand());
+//        register(new HexistsCommand());
+//        register(new HmgetCommand());
 
         // zset
+//        register(new ZaddCommand());
+//        register(new ZcardCommand());
+//        register(new ZscoreCommand());
+//        register(new ZremCommand());
+//        register(new ZrankCommand());
+//        register(new ZcountCommand());
 
     }
 

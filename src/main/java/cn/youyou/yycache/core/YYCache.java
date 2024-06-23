@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 内存缓存
@@ -122,11 +119,91 @@ public class YYCache {
 
     // ===============  2. list  ===========
 
+    public Integer lpush(String key, String... values) {
+        CacheEntry<LinkedList<String>> entry = (CacheEntry<LinkedList<String>>) map.get(key);
+        if (entry == null) {
+            entry = new CacheEntry<>(new LinkedList<>());
+            this.map.put(key, entry);
+        }
+        LinkedList<String> exist = entry.getValue();
+        Arrays.stream(values).forEach(exist::addFirst);
+        return exist.size();
+    }
 
+    public String[] lpop(String key, int count) {
+        CacheEntry<LinkedList<String>> entry = (CacheEntry<LinkedList<String>>) map.get(key);
+        if (entry == null)
+            return null;
+        LinkedList<String> exist = entry.getValue();
+        if (exist == null)
+            return null;
+        int len = Math.min(count, exist.size());
+        String[] ret = new String[len];
+        int index = 0;
+        while (index < len) {
+            ret[index++] = exist.removeFirst();
+        }
+        return ret;
+    }
 
+    public String[] rpop(String key, int count) {
+        CacheEntry<LinkedList<String>> entry = (CacheEntry<LinkedList<String>>) map.get(key);
+        if (entry == null)
+            return null;
+        LinkedList<String> exist = entry.getValue();
+        if (exist == null)
+            return null;
+        int len = Math.min(count, exist.size());
+        String[] ret = new String[len];
+        int index = 0;
+        while (index < len) {
+            ret[index++] = exist.removeLast();
+        }
+        return ret;
+    }
 
+    public Integer rpush(String key, String... values) {
+        CacheEntry<LinkedList<String>> entry = (CacheEntry<LinkedList<String>>) map.get(key);
+        if (entry == null) {
+            entry = new CacheEntry<>(new LinkedList<>());
+            this.map.put(key, entry);
+        }
+        LinkedList<String> exist = entry.getValue();
+        Arrays.stream(values).forEach(exist::addLast);
+        return exist.size();
+    }
 
+    public Integer llen(String key) {
+        CacheEntry<LinkedList<String>> entry = (CacheEntry<LinkedList<String>>) map.get(key);
+        if (entry == null) return 0;
+        LinkedList<String> exist = entry.getValue();
+        if (exist == null) return 0;
+        return exist.size();
+    }
 
+    public String lindex(String key, int index) {
+        CacheEntry<LinkedList<String>> entry = (CacheEntry<LinkedList<String>>) map.get(key);
+        if (entry == null) return null;
+        LinkedList<String> exist = entry.getValue();
+        if (exist == null) return null;
+        if(index >= exist.size()) return null;
+        return exist.get(index);
+    }
+
+    public String[] lrange(String key, int start, int end) {
+        CacheEntry<LinkedList<String>> entry = (CacheEntry<LinkedList<String>>) map.get(key);
+        if (entry == null) return null;
+        LinkedList<String> exist = entry.getValue();
+        if (exist == null) return null;
+        int size = exist.size();
+        if(start >= size) return null;
+        if(end >= size) end = size - 1;
+        int len = Math.min(size, end - start + 1);
+        String[] ret = new String[len];
+        for(int i=0;i<len;i++) {
+            ret[i] = exist.get(start + i);
+        }
+        return ret;    }
 
 
     // ===============  2. list end ===========
