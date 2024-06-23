@@ -6,6 +6,7 @@ import cn.youyou.yycache.core.YYCache;
 
 /**
  * String数据类型：给定key的value值减一
+ * DECR key
  */
 public class DecrCommand implements Command {
     @Override

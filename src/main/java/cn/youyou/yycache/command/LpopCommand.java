@@ -6,6 +6,7 @@ import cn.youyou.yycache.core.YYCache;
 
 /**
  * List数据类型：移出并获取列表的第一个元素,支持获取多个元素
+ * 	LPOP key [count]
  */
 public class LpopCommand implements Command {
     @Override

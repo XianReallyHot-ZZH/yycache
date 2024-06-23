@@ -5,19 +5,19 @@ import cn.youyou.yycache.core.Reply;
 import cn.youyou.yycache.core.YYCache;
 
 /**
- * List数据类型：在列表中添加一个或多个值到列表尾部
- * RPUSH key value1 [value2]
+ * Set类型数据结构：移除集合中一个或多个成员
+ * SREM key member1 [member2]
  */
-public class RpushCommand implements Command {
+public class SremCommand implements Command {
     @Override
     public String name() {
-        return "RPUSH";
+        return "SREM";
     }
 
     @Override
     public Reply<?> execute(YYCache cache, String[] args) {
         String key = getKey(args);
-        String[] values = getParamsNoKey(args);
-        return Reply.integer(cache.rpush(key, values));
+        String[] vals = getParamsNoKey(args);
+        return Reply.integer(cache.srem(key, vals));
     }
 }

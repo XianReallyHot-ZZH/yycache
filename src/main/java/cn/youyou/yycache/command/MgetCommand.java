@@ -6,6 +6,7 @@ import cn.youyou.yycache.core.YYCache;
 
 /**
  * String数据类型：批量获取指定key的值
+ * MGET key1 [key2..]
  */
 public class MgetCommand implements Command {
     @Override

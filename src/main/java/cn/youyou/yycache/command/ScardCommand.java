@@ -5,19 +5,18 @@ import cn.youyou.yycache.core.Reply;
 import cn.youyou.yycache.core.YYCache;
 
 /**
- * List数据类型：在列表中添加一个或多个值到列表尾部
- * RPUSH key value1 [value2]
+ * Set类型数据结构：获取集合的成员数
+ * SCARD key
  */
-public class RpushCommand implements Command {
+public class ScardCommand implements Command {
     @Override
     public String name() {
-        return "RPUSH";
+        return "SCARD";
     }
 
     @Override
     public Reply<?> execute(YYCache cache, String[] args) {
         String key = getKey(args);
-        String[] values = getParamsNoKey(args);
-        return Reply.integer(cache.rpush(key, values));
+        return Reply.integer(cache.scard(key));
     }
 }

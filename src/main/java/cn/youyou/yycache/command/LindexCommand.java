@@ -6,6 +6,7 @@ import cn.youyou.yycache.core.YYCache;
 
 /**
  * List数据类型：通过索引获取列表中的元素
+ * LINDEX key index
  */
 public class LindexCommand implements Command {
     @Override

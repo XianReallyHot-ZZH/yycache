@@ -6,6 +6,7 @@ import cn.youyou.yycache.core.YYCache;
 
 /**
  * List数据类型：获取列表长度
+ * LLEN key
  */
 public class LlenCommand implements Command {
     @Override

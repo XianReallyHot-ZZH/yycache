@@ -5,7 +5,8 @@ import cn.youyou.yycache.core.Reply;
 import cn.youyou.yycache.core.YYCache;
 
 /**
- * List数据类型：获取列表指定范围内的元素,LRANGE key start stop
+ * List数据类型：获取列表指定范围内的元素
+ * LRANGE key start stop
  */
 public class LrangeCommand implements Command {
     @Override

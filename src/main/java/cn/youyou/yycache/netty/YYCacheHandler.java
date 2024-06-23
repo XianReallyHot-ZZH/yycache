@@ -39,7 +39,7 @@ public class YYCacheHandler extends SimpleChannelInboundHandler<String> {
             try {
                 writeContext(ctx, command.execute(cache, args));
             } catch (Exception e) {
-                log.error("Command指令执行异常, exception with msg: {}", e.getMessage());
+                log.error("Command指令执行异常, exception with msg: {}", e.getMessage(), e);
                 Reply<?> reply = Reply.error("EXP exception with msg: '" + e.getMessage() + "'");
                 writeContext(ctx, reply);
             }

@@ -6,6 +6,7 @@ import cn.youyou.yycache.core.YYCache;
 
 /**
  * String数据类型：批量进行键值对存储
+ * MSET key value [key value ...]
  */
 public class MsetCommand implements Command {
     @Override

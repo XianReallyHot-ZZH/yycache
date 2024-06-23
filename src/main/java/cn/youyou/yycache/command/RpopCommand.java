@@ -6,6 +6,7 @@ import cn.youyou.yycache.core.YYCache;
 
 /**
  * List数据类型：移除列表的最后一个元素，返回值为移除的元素。
+ * RPOP key [count]
  */
 public class RpopCommand implements Command {
     @Override

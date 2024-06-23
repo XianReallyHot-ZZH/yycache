@@ -6,6 +6,7 @@ import cn.youyou.yycache.core.YYCache;
 
 /**
  * String数据类型：给定key的value值加一
+ * INCR key
  */
 public class IncrCommand implements Command {
     @Override

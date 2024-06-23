@@ -6,6 +6,7 @@ import cn.youyou.yycache.core.YYCache;
 
 /**
  * List数据类型：将一个或多个值插入到列表头部
+ * LPUSH key value1 [value2]
  */
 public class LpushCommand implements Command {
     @Override

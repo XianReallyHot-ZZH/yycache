@@ -6,6 +6,7 @@ import cn.youyou.yycache.core.YYCache;
 
 /**
  * String数据类型：获取某个key对应的value的长度
+ * STRLEN key
  */
 public class StrlenCommand implements Command {
     @Override

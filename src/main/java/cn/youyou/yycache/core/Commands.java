@@ -46,12 +46,12 @@ public class Commands {
         register(new LrangeCommand());
 
         // set
-//        register(new SaddCommand());
-//        register(new SmembersCommand());
-//        register(new SremCommand());
-//        register(new ScardCommand());
-//        register(new SpopCommand());
-//        register(new SismemberCommand());
+        register(new SaddCommand());
+        register(new SmembersCommand());
+        register(new SremCommand());
+        register(new ScardCommand());
+        register(new SpopCommand());
+        register(new SismemberCommand());
 
         // hash
 //        register(new HsetCommand());

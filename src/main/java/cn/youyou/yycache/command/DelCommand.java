@@ -6,6 +6,7 @@ import cn.youyou.yycache.core.YYCache;
 
 /**
  * String数据类型：删除某个key,支持批量操作
+ * 	DEL key [key ...]
  */
 public class DelCommand implements Command {
     @Override

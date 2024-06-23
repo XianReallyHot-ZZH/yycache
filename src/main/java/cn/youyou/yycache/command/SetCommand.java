@@ -6,6 +6,7 @@ import cn.youyou.yycache.core.YYCache;
 
 /**
  * String数据类型：设置键值对
+ * SET key value
  */
 public class SetCommand implements Command {
     @Override

@@ -203,16 +203,75 @@ public class YYCache {
         for(int i=0;i<len;i++) {
             ret[i] = exist.get(start + i);
         }
-        return ret;    }
-
+        return ret;
+    }
 
     // ===============  2. list end ===========
 
     // ===============  3. set  ===========
 
+    public Integer sadd(String key, String[] vals) {
+        CacheEntry<LinkedHashSet<String>> entry = (CacheEntry<LinkedHashSet<String>>) map.get(key);
+        if(entry == null) {
+            entry = new CacheEntry<>(new LinkedHashSet<>());
+            this.map.put(key, entry);
+        }
+        LinkedHashSet<String> exist = entry.getValue();
+        int before = exist.size();
+        exist.addAll(Arrays.asList(vals));
+        int after = exist.size();
+        return after - before;
+    }
 
+    public String[] smembers(String key) {
+        CacheEntry<LinkedHashSet<String>> entry = (CacheEntry<LinkedHashSet<String>>) map.get(key);
+        if(entry == null) return null;
+        LinkedHashSet<String> exist = entry.getValue();
+        if (exist == null) return null;
+        return exist.toArray(String[]::new);
+    }
 
+    public Integer srem(String key, String[] vals) {
+        CacheEntry<LinkedHashSet<String>> entry = (CacheEntry<LinkedHashSet<String>>) map.get(key);
+        if(entry == null) return 0;
+        LinkedHashSet<String> exist = entry.getValue();
+        if (exist == null) return null;
+        return vals==null ? 0 : (int) Arrays.stream(vals).map(exist::remove).filter(x -> x).count();
+    }
 
+    public Integer scard(String key) {
+        CacheEntry<?> entry = map.get(key);
+        if(entry == null) return 0;
+        LinkedHashSet<?> exist = (LinkedHashSet<?>) entry.getValue();
+        if (exist == null) return 0;
+        return exist.size();
+    }
+
+    Random random = new Random();
+    public String[] spop(String key, int count) {
+        CacheEntry<LinkedHashSet<String>> entry = (CacheEntry<LinkedHashSet<String>>) map.get(key);
+        if(entry == null) return null;
+        LinkedHashSet<String> exist = entry.getValue();
+        if(exist == null) return null;
+        int len = Math.min(count, exist.size());
+        String[] ret = new String[len];
+        int index = 0;
+        while(index < len) {
+            String[] array = exist.toArray(String[]::new);
+            String obj = array[random.nextInt(exist.size())];
+            exist.remove(obj);
+            ret[index ++] = obj;
+        }
+        return ret;
+    }
+
+    public Integer sismember(String key, String val) {
+        CacheEntry<LinkedHashSet<String>> entry = (CacheEntry<LinkedHashSet<String>>) map.get(key);
+        if(entry == null) return 0;
+        LinkedHashSet<String> exist = entry.getValue();
+        if(exist == null) return null;
+        return exist.contains(val) ? 1 : 0;
+    }
 
 
     // ===============  3. set end ===========

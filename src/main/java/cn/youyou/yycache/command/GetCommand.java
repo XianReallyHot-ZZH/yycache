@@ -6,6 +6,7 @@ import cn.youyou.yycache.core.YYCache;
 
 /**
  * String数据类型：获取某个key的value
+ * GET key
  */
 public class GetCommand implements Command {
     @Override
