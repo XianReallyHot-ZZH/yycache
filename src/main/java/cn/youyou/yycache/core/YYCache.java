@@ -344,10 +344,74 @@ public class YYCache {
         return hkeys == null ? new String[0] : Arrays.stream(hkeys).map(exist::get).toArray(String[]::new);
     }
 
-
     // ===============  4. hash end ===========
 
     // ===============  5. zset end ===========
+
+    public Integer zadd(String key, String[] values, double[] scores) {
+        CacheEntry<LinkedHashSet<ZsetEntry>> entry = (CacheEntry<LinkedHashSet<ZsetEntry>>) map.get(key);
+        if (entry == null) {
+            entry = new CacheEntry<>(new LinkedHashSet<>());
+            this.map.put(key, entry);
+        }
+        LinkedHashSet<ZsetEntry> exist = entry.getValue();
+        int before = exist.size();
+        for (int i = 0; i < values.length; i++) {
+            String val = values[i];
+            // 添加不成功，说明已经有重复的了
+            if (!exist.add(new ZsetEntry(values[i], scores[i]))) {
+                // 找出来重复的，删掉，然后添加进新值
+                exist.removeIf(zsetEntry -> zsetEntry.getValue().equals(val));
+                exist.add(new ZsetEntry(values[i], scores[i]));
+            }
+        }
+        int after = exist.size();
+        return after - before;
+    }
+
+    public Integer zcard(String key) {
+        CacheEntry<?> entry = map.get(key);
+        if(entry == null) return 0;
+        LinkedHashSet<?> exist = (LinkedHashSet<?>) entry.getValue();
+        if (exist == null) return 0;
+        return exist.size();
+    }
+
+    public Double zscore(String key, String val) {
+        CacheEntry<?> entry = map.get(key);
+        if(entry == null) return null;
+        LinkedHashSet<ZsetEntry> exist = (LinkedHashSet<ZsetEntry>) entry.getValue();
+        if (exist == null) return null;
+        return exist.stream().filter(x -> x.getValue().equals(val)).map(ZsetEntry::getScore).findFirst().orElse(null);
+    }
+
+    public Integer zrem(String key, String[] vals) {
+        CacheEntry<?> entry = map.get(key);
+        if(entry == null) return null;
+        LinkedHashSet<ZsetEntry> exist = (LinkedHashSet<ZsetEntry>) entry.getValue();
+        if (exist == null) return null;
+        return vals==null ? 0 : (int) Arrays.stream(vals)
+                .map(x -> exist.removeIf( y -> y.getValue().equals(x)))
+                .filter(x -> x).count();
+    }
+
+    public Integer zrank(String key, String val) {
+        CacheEntry<?> entry = map.get(key);
+        if(entry == null) return null;
+        LinkedHashSet<ZsetEntry> exist = (LinkedHashSet<ZsetEntry>) entry.getValue();
+        if (exist == null) return null;
+        Double zscore = zscore(key, val);
+        if(zscore == null) return null;
+        return (int) exist.stream().filter(x -> x.getScore() < zscore).count();
+    }
+
+    public Integer zcount(String key, double min, double max) {
+        CacheEntry<?> entry = map.get(key);
+        if(entry == null) return 0;
+        LinkedHashSet<ZsetEntry> exist = (LinkedHashSet<ZsetEntry>) entry.getValue();
+        if (exist == null) return 0;
+        return (int)exist.stream().filter(x -> x.getScore() >= min && x.getScore() <= max).count();
+    }
 
 
     // ===============  5. zset end ===========
@@ -373,5 +437,19 @@ public class YYCache {
     public static class ZsetEntry {
         private String value;
         private double score;
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof ZsetEntry entry) {
+                return entry.getValue().equals(value);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return value.hashCode();
+        }
+
     }
 }

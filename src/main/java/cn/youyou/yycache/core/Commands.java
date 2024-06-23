@@ -63,12 +63,12 @@ public class Commands {
         register(new HmgetCommand());
 
         // zset
-//        register(new ZaddCommand());
-//        register(new ZcardCommand());
-//        register(new ZscoreCommand());
-//        register(new ZremCommand());
-//        register(new ZrankCommand());
-//        register(new ZcountCommand());
+        register(new ZaddCommand());
+        register(new ZcardCommand());
+        register(new ZscoreCommand());
+        register(new ZremCommand());
+        register(new ZrankCommand());
+        register(new ZcountCommand());
 
     }
 
